@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.algalog.domain.model.Cliente;
 import br.com.algalog.domain.repository.ClienteRepository;
+import br.com.algalog.domain.service.CatalogoClienteService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,9 @@ public class ClienteController {
 
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private CatalogoClienteService catalogoClienteService;
 	
 	@GetMapping
 	public List<Cliente> listar() {
@@ -58,18 +62,18 @@ public class ClienteController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cliente adicionar(@Valid @RequestBody Cliente cliente){
-		return clienteRepository.save(cliente);
+		return catalogoClienteService.salvar(cliente);
 	}
 	
 	@PutMapping("{id}")
 	public ResponseEntity<Cliente> atuaizar(@PathVariable Long id,
 			@Valid @RequestBody Cliente cliente) {
 		if (!clienteRepository.existsById(id)) {
-			return ResponseEntity.notFound().build();
+     		return ResponseEntity.notFound().build();
 		}
 		
 		cliente.setId(id);
-		cliente = clienteRepository.save(cliente);
+		catalogoClienteService.salvar(cliente);
 		
 		return ResponseEntity.ok(cliente);
 	}
@@ -80,7 +84,8 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clienteRepository.deleteById(id);
+		catalogoClienteService.excluir(id);
+		//clienteRepository.deleteById(id);
 		
 		return ResponseEntity.noContent().build();
 	}
